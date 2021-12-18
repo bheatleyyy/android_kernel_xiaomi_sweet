@@ -1197,7 +1197,8 @@ static void affine_one_perf_thread(struct irqaction *action)
 	if (!action->thread)
 		return;
 
-	mask = cpu_perf_mask;
+	if (action->flags & IRQF_PERF_AFFINE)
+	    mask = cpu_perf_mask;
 
 	if (action->flags & IRQF_PERF_FIRST_AFFINE)
 		mask = cpu_perf_first_mask;
@@ -1223,9 +1224,11 @@ static void affine_one_perf_irq(struct irq_desc *desc, unsigned int perf_flag)
 	const struct cpumask *mask;
 	int *mask_index;
 	int cpu;
-
-	mask = cpu_perf_mask;
-	mask_index = &perf_cpu_index;
+  
+    if (perf_flag & IRQF_PERF_AFFINE) {
+	    mask = cpu_perf_mask;
+	    mask_index = &perf_cpu_index;
+	}
 
 	if (perf_flag & IRQF_PERF_FIRST_AFFINE) {
 		mask = cpu_perf_first_mask;
